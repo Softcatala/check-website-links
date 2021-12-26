@@ -54,6 +54,7 @@ def get_value(item, key):
 
     return url
 
+
 def check_links(source_filename):
     tree = ET.parse(source_filename)
     root = tree.getroot()
@@ -67,7 +68,8 @@ def check_links(source_filename):
         for item in entry:
             #print(item.tag)
         
-            url = None
+            program_url = None
+            download_urls = []
             if item.tag == "{http://wordpress.org/export/1.2/}status":
                 if item.text == "publish":
                     publish = True
@@ -77,15 +79,24 @@ def check_links(source_filename):
 
             if item.tag == "{http://wordpress.org/export/1.2/}postmeta":
                 url = get_value(item, 'lloc_web_programa')
+                for i in range(0, 8):
+                    download_url = get_value(item, f'baixada_{i}_download_url')
+                    if download_url:
+                        download_urls.append(download_url)
 
             if publish and url is not None:
                 result = check_link(url)
                 logging.debug(f"Checked {url} status code: {result}")
                 if result != 200:
-                    print(f"Programa {json_item['title']} - link {url}, error {result} ")
+                    print(f"Programa {json_item['title']} - 'lloc_web_programa' {url}, error {result} ")
 
-         
-  
+            if publish and len(download_urls) > 0:
+                for url in download_urls:
+                    result = check_link(url)
+                    logging.debug(f"Checked {url} status code: {result}")
+                    if result != 200:
+                        print(f"Programa {json_item['title']} - 'download_url' {url}, error {result} ")
+        
     print(f"Processed {len(items)} items")
 
 
