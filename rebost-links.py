@@ -37,6 +37,23 @@ def check_link(url):
         logging.error(f"{url} - {e}")
         return 523
 
+def get_value(item, key):
+    url = None
+    link = False
+    for child_item in item:
+        #print(child_item.tag)
+        if child_item.tag == '{http://wordpress.org/export/1.2/}meta_key':
+            #print(child_item.text)
+            if key == child_item.text:
+                link = True
+
+        if link and child_item.tag == '{http://wordpress.org/export/1.2/}meta_value':
+            #print(child_item.text)
+            link = False
+            url = child_item.text
+
+    return url
+
 def check_links(source_filename):
     tree = ET.parse(source_filename)
     root = tree.getroot()
@@ -59,25 +76,13 @@ def check_links(source_filename):
                 json_item['title'] = item.text
 
             if item.tag == "{http://wordpress.org/export/1.2/}postmeta":
-                #print("aqui")
-                link = False
-                for child_item in item:
-                    #print(child_item.tag)
-                    if child_item.tag == '{http://wordpress.org/export/1.2/}meta_key':
-                        #print(child_item.text)
-                        if 'lloc_web_programa' == child_item.text:
-                            link = True
-
-                    if link and child_item.tag == '{http://wordpress.org/export/1.2/}meta_value':
-                        #print(child_item.text)
-                        link = False
-                        url = child_item.text
+                url = get_value(item, 'lloc_web_programa')
 
             if publish and url is not None:
                 result = check_link(url)
                 logging.debug(f"Checked {url} status code: {result}")
                 if result != 200:
-                    print(f"Programa {json_item['title']} - link {child_item.text}, error {result} ")
+                    print(f"Programa {json_item['title']} - link {url}, error {result} ")
 
          
   
