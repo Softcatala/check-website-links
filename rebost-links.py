@@ -60,8 +60,8 @@ def get_content_urls(html):
     urls = []
     soup = BeautifulSoup(html, "html5lib")
     for a in soup.findAll('a'):
-        url = a['href']
-        if url[0:4] == "http":
+        url = a.get('href')
+        if url is not None and url[0:4] == "http":
             urls.append(url)
 
     return urls
@@ -84,7 +84,6 @@ def check_links(source_filename):
     root = tree.getroot()
 
     items = 0
-    words = 0
     for entry in root.iter('item'):
         #print(f"tag: {entry.tag}")
         json_item = {}
@@ -114,20 +113,26 @@ def check_links(source_filename):
                     if download_url:
                         download_urls.append(download_url)
 
-            if publish and url is not None:
+            if publish == False:
+                continue
+
+            if 'title' not in json_item:
+                continue
+
+            if url is not None:
                 result = check_link(url)
                 logging.debug(f"Checked {url} status code: {result}")
                 if result != 200:
                     print_error(json_item, url, 'lloc_web_programa', result)
                 
-            if publish and len(download_urls) > 0:
+            if len(download_urls) > 0:
                 for url in download_urls:
                     result = check_link(url)
                     logging.debug(f"Checked {url} status code: {result}")
                     if result != 200:
                         print_error(json_item, url, 'download_url', result)
 
-            if publish and len(content_urls) > 0:
+            if len(content_urls) > 0:
                 for url in content_urls:
                     result = check_link(url)
                     logging.debug(f"Checked {url} status code: {result}")
