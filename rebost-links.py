@@ -54,6 +54,18 @@ def get_value(item, key):
 
     return url
 
+def print_error(json_item, url, url_type, result):
+
+    http = "http://"
+    if url[0:len(http)] == "http://":
+        https_url = "https://" + url[len(http):]
+        https_result = check_link(https_url)
+        if https_result == 200:
+            print(f"Programa {json_item['title']} - '{url_type}' {url}, error {result} - (possible nova URL {https_url} que no dóna error)")
+            return
+
+    print(f"Programa {json_item['title']} - '{url_type}' {url}, error {result} ")
+
 
 def check_links(source_filename):
     tree = ET.parse(source_filename)
@@ -88,14 +100,14 @@ def check_links(source_filename):
                 result = check_link(url)
                 logging.debug(f"Checked {url} status code: {result}")
                 if result != 200:
-                    print(f"Programa {json_item['title']} - 'lloc_web_programa' {url}, error {result} ")
-
+                    print_error(json_item, url, 'lloc_web_programa', result)
+                
             if publish and len(download_urls) > 0:
                 for url in download_urls:
                     result = check_link(url)
                     logging.debug(f"Checked {url} status code: {result}")
                     if result != 200:
-                        print(f"Programa {json_item['title']} - 'download_url' {url}, error {result} ")
+                        print_error(json_item, url, 'download_url', result)
         
     print(f"Processed {len(items)} items")
 
