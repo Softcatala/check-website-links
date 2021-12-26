@@ -23,6 +23,7 @@ import xml.etree.ElementTree as ET
 import logging
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
+from bs4 import BeautifulSoup
 
 def check_link(url):
     try:
@@ -54,6 +55,17 @@ def get_value(item, key):
 
     return url
 
+
+def get_content_urls(html):
+    urls = []
+    soup = BeautifulSoup(html, "html5lib")
+    for a in soup.findAll('a'):
+        url = a['href']
+        if url[0:4] == "http":
+            urls.append(url)
+
+    return urls
+
 def print_error(json_item, url, url_type, result):
 
     http = "http://"
@@ -82,6 +94,11 @@ def check_links(source_filename):
         
             program_url = None
             download_urls = []
+            content_urls = []
+
+            if item.tag == "{http://purl.org/rss/1.0/modules/content/}encoded" and item.text is not None:
+                content_urls = get_content_urls(item.text)
+
             if item.tag == "{http://wordpress.org/export/1.2/}status":
                 if item.text == "publish":
                     publish = True
@@ -108,6 +125,13 @@ def check_links(source_filename):
                     logging.debug(f"Checked {url} status code: {result}")
                     if result != 200:
                         print_error(json_item, url, 'download_url', result)
+
+            if publish and len(content_urls) > 0:
+                for url in content_urls:
+                    result = check_link(url)
+                    logging.debug(f"Checked {url} status code: {result}")
+                    if result != 200:
+                        print_error(json_item, url, 'content_urls', result)
         
     print(f"Processed {len(items)} items")
 
