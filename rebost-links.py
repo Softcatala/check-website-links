@@ -83,13 +83,14 @@ def check_links(source_filename):
     tree = ET.parse(source_filename)
     root = tree.getroot()
 
-    items = []
+    items = 0
     words = 0
     for entry in root.iter('item'):
         #print(f"tag: {entry.tag}")
         json_item = {}
         publish = False
         for item in entry:
+
             #print(item.tag)
         
             program_url = None
@@ -132,8 +133,10 @@ def check_links(source_filename):
                     logging.debug(f"Checked {url} status code: {result}")
                     if result != 200:
                         print_error(json_item, url, 'content_urls', result)
+
+            items += 1
         
-    print(f"Processed {len(items)} items")
+    print(f"Processed {items} items")
 
 
 def main():
