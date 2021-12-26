@@ -27,12 +27,14 @@ from urllib.error import HTTPError
 def check_link(url):
     try:
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        x =  urlopen(req)
+        x =  urlopen(req, timeout=60)
         return 200
     except HTTPError as e:
+        logging.error(f"{url} - {e}")
         return e.code
     
     except Exception as e:
+        logging.error(f"{url} - {e}")
         return 523
 
 def check_links(source_filename):
@@ -71,7 +73,7 @@ def check_links(source_filename):
                         link = False
                         url = child_item.text
 
-            if url is not None:    
+            if publish and url is not None:
                 result = check_link(url)
                 logging.debug(f"Checked {url} status code: {result}")
                 if result != 200:
