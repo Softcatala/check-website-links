@@ -90,7 +90,6 @@ def check_links(source_filename):
         #print(f"tag: {entry.tag}")
         json_item = {}
         publish = False
-        url = None 
         program_url = None
         download_urls = []
         content_urls = []
@@ -110,6 +109,9 @@ def check_links(source_filename):
      
             if item.tag == "{http://wordpress.org/export/1.2/}postmeta":
                 url = get_value(item, 'lloc_web_programa')
+                if url:
+                    program_url = url
+
                 for i in range(0, 8):
                     download_url = get_value(item, f'baixada_{i}_download_url')
                     if download_url:
@@ -125,12 +127,12 @@ def check_links(source_filename):
         if 'title' not in json_item:
             continue
 
-        if url is not None:
-            result = check_link(url)
-            logging.debug(f"Checked program {url} status code: {result}")
+        if program_url:
+            result = check_link(program_url)
+            logging.debug(f"Checked program {program_url} status code: {result}")
             if result != 200:
                 broken_links += 1
-                print_error(json_item, url, 'lloc_web_programa', result)
+                print_error(json_item, program_url, 'lloc_web_programa', result)
             
         if len(download_urls) > 0:
             for url in download_urls:
