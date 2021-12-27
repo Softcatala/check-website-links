@@ -84,28 +84,29 @@ def check_links(source_filename):
     root = tree.getroot()
 
     items = 0
+    analyzed_items = 0
     for entry in root.iter('item'):
         #print(f"tag: {entry.tag}")
         json_item = {}
         publish = False
+        url = None 
+        program_url = None
+        download_urls = []
+        content_urls = []
+        status = ""
+
         for item in entry:
-
-            #print(item.tag)
-            url = None 
-            program_url = None
-            download_urls = []
-            content_urls = []
-
-            if item.tag == "{http://purl.org/rss/1.0/modules/content/}encoded" and item.text is not None:
-                content_urls = get_content_urls(item.text)
-
+        
             if item.tag == "{http://wordpress.org/export/1.2/}status":
                 if item.text == "publish":
                     publish = True
 
+                status = item.text
+
             if item.tag == "title":
                 json_item['title'] = item.text
 
+     
             if item.tag == "{http://wordpress.org/export/1.2/}postmeta":
                 url = get_value(item, 'lloc_web_programa')
                 for i in range(0, 8):
@@ -113,35 +114,39 @@ def check_links(source_filename):
                     if download_url:
                         download_urls.append(download_url)
 
-            if publish == False:
-                continue
+            if item.tag == "{http://purl.org/rss/1.0/modules/content/}encoded" and item.text is not None:
+                content_urls = get_content_urls(item.text)
 
-            if 'title' not in json_item:
-                continue
 
-            if url is not None:
+        if publish == False:
+            continue
+
+        if 'title' not in json_item:
+            continue
+
+        if url is not None:
+            result = check_link(url)
+            logging.debug(f"Checked program {url} status code: {result}")
+            if result != 200:
+                print_error(json_item, url, 'lloc_web_programa', result)
+            
+        if len(download_urls) > 0:
+            for url in download_urls:
                 result = check_link(url)
-                logging.debug(f"Checked program {url} status code: {result}")
+                logging.debug(f"Checked download {url} status code: {result}")
                 if result != 200:
-                    print_error(json_item, url, 'lloc_web_programa', result)
-                
-            if len(download_urls) > 0:
-                for url in download_urls:
-                    result = check_link(url)
-                    logging.debug(f"Checked download {url} status code: {result}")
-                    if result != 200:
-                        print_error(json_item, url, 'download_url', result)
+                    print_error(json_item, url, 'download_url', result)
 
-            if len(content_urls) > 0:
-                for url in content_urls:
-                    result = check_link(url)
-                    logging.debug(f"Checked content {url} status code: {result}")
-                    if result != 200:
-                        print_error(json_item, url, 'content_urls', result)
+        if len(content_urls) > 0:
+            for url in content_urls:
+                result = check_link(url)
+                logging.debug(f"Checked content {url} status code: {result}")
+                if result != 200:
+                    print_error(json_item, url, 'content_urls', result)
 
-            items += 1
+        analyzed_items += 1
         
-    print(f"Processed {items} items")
+    print(f"Analyzed {analyzed_items} items")
 
 
 def main():
