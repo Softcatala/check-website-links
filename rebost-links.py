@@ -145,7 +145,7 @@ def check_links(source_filename):
 
 
 def main():
-    print("Converts a WordPress export to a JSON usable dataset")
+    print("Checks the links of the Softcatalà program directory (Rebost)")
     logging.basicConfig(filename="rebost-links.log", level=logging.DEBUG, filemode="w")
     check_links("raw/programes.xml")
 
