@@ -93,7 +93,6 @@ def check_links(source_filename):
         program_url = None
         download_urls = []
         content_urls = []
-        status = ""
 
         for item in entry:
         
@@ -101,11 +100,8 @@ def check_links(source_filename):
                 if item.text == "publish":
                     publish = True
 
-                status = item.text
-
             if item.tag == "title":
                 json_item['title'] = item.text
-
      
             if item.tag == "{http://wordpress.org/export/1.2/}postmeta":
                 url = get_value(item, 'lloc_web_programa')
