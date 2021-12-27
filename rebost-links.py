@@ -91,7 +91,7 @@ def check_links(source_filename):
         for item in entry:
 
             #print(item.tag)
-        
+            url = None 
             program_url = None
             download_urls = []
             content_urls = []
