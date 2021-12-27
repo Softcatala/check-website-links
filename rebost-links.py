@@ -121,21 +121,21 @@ def check_links(source_filename):
 
             if url is not None:
                 result = check_link(url)
-                logging.debug(f"Checked {url} status code: {result}")
+                logging.debug(f"Checked program {url} status code: {result}")
                 if result != 200:
                     print_error(json_item, url, 'lloc_web_programa', result)
                 
             if len(download_urls) > 0:
                 for url in download_urls:
                     result = check_link(url)
-                    logging.debug(f"Checked {url} status code: {result}")
+                    logging.debug(f"Checked download {url} status code: {result}")
                     if result != 200:
                         print_error(json_item, url, 'download_url', result)
 
             if len(content_urls) > 0:
                 for url in content_urls:
                     result = check_link(url)
-                    logging.debug(f"Checked {url} status code: {result}")
+                    logging.debug(f"Checked content {url} status code: {result}")
                     if result != 200:
                         print_error(json_item, url, 'content_urls', result)
 
