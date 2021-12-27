@@ -93,6 +93,7 @@ def check_links(source_filename):
         program_url = None
         download_urls = []
         content_urls = []
+        external_url = None
 
         for item in entry:
         
@@ -104,6 +105,10 @@ def check_links(source_filename):
                 json_item['title'] = item.text
      
             if item.tag == "{http://wordpress.org/export/1.2/}postmeta":
+                url = get_value(item, 'external_project_url')
+                if url:
+                    external_url = url
+
                 url = get_value(item, 'lloc_web_programa')
                 if url:
                     program_url = url
@@ -129,6 +134,14 @@ def check_links(source_filename):
             if result != 200:
                 broken_links += 1
                 print_error(json_item, program_url, 'lloc_web_programa', result)
+
+        if external_url:
+            result = check_link(external_url)
+            logging.debug(f"Checked external_url {external_url} status code: {result}")
+            if result != 200:
+                broken_links += 1
+                print_error(json_item, external_url, 'external_url', result)
+        
             
         if len(download_urls) > 0:
             for url in download_urls:
