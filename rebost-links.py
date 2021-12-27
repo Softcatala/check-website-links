@@ -85,6 +85,7 @@ def check_links(source_filename):
 
     items = 0
     analyzed_items = 0
+    broken_links = 0
     for entry in root.iter('item'):
         #print(f"tag: {entry.tag}")
         json_item = {}
@@ -128,6 +129,7 @@ def check_links(source_filename):
             result = check_link(url)
             logging.debug(f"Checked program {url} status code: {result}")
             if result != 200:
+                broken_links += 1
                 print_error(json_item, url, 'lloc_web_programa', result)
             
         if len(download_urls) > 0:
@@ -135,6 +137,7 @@ def check_links(source_filename):
                 result = check_link(url)
                 logging.debug(f"Checked download {url} status code: {result}")
                 if result != 200:
+                    broken_links += 1
                     print_error(json_item, url, 'download_url', result)
 
         if len(content_urls) > 0:
@@ -142,11 +145,12 @@ def check_links(source_filename):
                 result = check_link(url)
                 logging.debug(f"Checked content {url} status code: {result}")
                 if result != 200:
+                    broken_links += 1
                     print_error(json_item, url, 'content_urls', result)
 
         analyzed_items += 1
         
-    print(f"Analyzed {analyzed_items} items")
+    print(f"Analyzed {analyzed_items} items, broken links {broken_links}")
 
 
 def main():
