@@ -4,7 +4,7 @@ Aquest programa detecta enllaços trencats al directori de programes de Softcata
 
 Per utilitzar-ho:
 
-1. Aneu al Wordpress i feu: Eines -> Exporta -> Programes. El fitxer xml que baixi el deseu a __raw/programes.xml__.
+1. Aneu al Wordpress i feu: Eines -> Exporta -> Programes. El fitxer xml que baixi el deseu a _raw/programes.xml_.
 
 2. Executeu
 
